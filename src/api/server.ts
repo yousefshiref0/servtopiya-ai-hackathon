@@ -32,7 +32,6 @@ app.setErrorHandler((error, request, reply) => {
 
 async function start() {
   try {
-    // Plugins first
     await app.register(multipart, {
       limits: {
         fileSize:
@@ -47,21 +46,18 @@ async function start() {
       global: false,
     });
 
-    // Manual limiter for /api/chat
     const checkChatRateLimit =
       app.createRateLimit({
         max: 20,
         timeWindow: "1 minute",
       });
 
-    // Health
     app.get("/health", async () => {
       return {
         status: "ok",
       };
     });
 
-    // List RAG modules
     app.get("/api/rags", async () => {
       return ragRegistry.list().map((rag) => ({
         id: rag.id,
@@ -70,7 +66,6 @@ async function start() {
       }));
     });
 
-    // Manual query to a specific RAG
     app.post(
       "/api/rags/:ragId/query",
       async (request, reply) => {
@@ -103,7 +98,6 @@ async function start() {
       }
     );
 
-    // List documents for a RAG
     app.get(
       "/api/rags/:ragId/documents",
       async (request, reply) => {
@@ -124,7 +118,6 @@ async function start() {
       }
     );
 
-    // Delete a document
     app.delete(
       "/api/rags/:ragId/documents/:id",
       async (request, reply) => {
@@ -173,7 +166,6 @@ async function start() {
       }
     );
 
-    // Ingest document into a RAG
     app.post(
       "/api/rags/:ragId/ingest",
       async (request, reply) => {
@@ -264,7 +256,6 @@ async function start() {
       }
     );
 
-    // Automatic RAG router + rate limit
     app.post(
       "/api/chat",
       async (request, reply) => {
@@ -331,7 +322,6 @@ async function start() {
       }
     );
 
-    // Listen last
     await app.listen({
       host: env.host,
       port: env.port,
